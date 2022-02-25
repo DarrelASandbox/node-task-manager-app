@@ -17,8 +17,8 @@ MongoClient.connect(
     // https://docs.mongodb.com/manual/tutorial/insert-documents/
     // db.collection('users').insertOne(
     //   {
-    //     name: 'God',
-    //     age: 751029547102375,
+    //     name: 'mongduck',
+    //     age: 75102952424,
     //   },
     //   (error, result) => {
     //     if (error) return console.log(error, 'Unable to insert user.');
@@ -34,7 +34,7 @@ MongoClient.connect(
     //     },
     //     {
     //       name: 'mongchick',
-    //       age: 91759175,
+    //       age: 59175,
     //     },
     //   ],
     //   (error, result) => {
@@ -58,5 +58,41 @@ MongoClient.connect(
     //       return console.log(error, 'Unable to get user data.');
     //     console.log(user);
     //   });
+
+    // https://docs.mongodb.com/manual/reference/operator/update/
+    // db.collection('users')
+    //   .updateOne(
+    //     { _id: new ObjectId('62187ff22c597d977e51148c') },
+    //     {
+    //       $set: {
+    //         name: 'mongduck',
+    //         age: 62049,
+    //       },
+    //     }
+    //   )
+    //   .then((result) => console.log(result))
+    //   .catch((error) => console.log(error));
+
+    // db.collection('users')
+    //   .updateMany(
+    //     {},
+    //     {
+    //       $inc: {
+    //         age: 1,
+    //       },
+    //     }
+    //   )
+    //   .then((result) => console.log(result))
+    //   .catch((error) => console.log(error));
+
+    // db.collection('users')
+    //   .deleteOne({ _id: new ObjectId('62187fdd3c4e93e9e6879ab4') })
+    //   .then((result) => console.log(result))
+    //   .catch((error) => console.log(error));
+
+    // db.collection('users')
+    //   .deleteMany({})
+    //   .then((result) => console.log(result))
+    //   .catch((error) => console.log(error));
   }
 );
