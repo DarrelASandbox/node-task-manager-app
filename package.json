@@ -2,14 +2,18 @@
   "name": "task-manager",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./src/index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node",
+    "dev": "npx nodemon -e mjs,js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^4.4.0"
+    "express": "^4.17.3",
+    "mongodb": "^4.4.0",
+    "mongoose": "^6.2.3",
+    "validator": "^13.7.0"
   }
 }
