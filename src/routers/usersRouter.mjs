@@ -19,9 +19,22 @@ usersRouter.post('/users', async (req, res) => {
 usersRouter.get('/users', async (req, res) => {
   try {
     const users = await User.find();
+    if (users.length === 0) return res.status(404).send('No user found.');
     res.send(users);
   } catch (e) {
     res.status(500).send();
+  }
+});
+
+usersRouter.post('/users/login', async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    res.send(user);
+  } catch (e) {
+    res.status(400).send();
   }
 });
 
