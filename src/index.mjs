@@ -45,6 +45,31 @@ app.get('/users/:id', async (req, res) => {
   }
 });
 
+app.patch('/users/:id', async (req, res) => {
+  const updateFields = Object.keys(req.body);
+  // Feature improvement: Dynamically fetching fields from the Mongoose model
+  const allowedUpdateFields = ['name', 'age', 'email', 'password'];
+  const isValidUpdateField = updateFields.every((update) =>
+    allowedUpdateFields.includes(update)
+  );
+
+  if (!isValidUpdateField) return res.status(400).send('Invalid update field.');
+
+  if (!mongoose.isValidObjectId(req.params.id))
+    return res.status(404).send('Invalid id.');
+
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!user) return res.status(404).send('No user found.');
+    res.send(user);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
 app.post('/tasks', async (req, res) => {
   const task = new Task(req.body);
   try {
@@ -75,6 +100,31 @@ app.get('/tasks/:id', async (req, res) => {
     res.send(task);
   } catch (e) {
     res.status(500).send(e);
+  }
+});
+
+app.patch('/tasks/:id', async (req, res) => {
+  const updateFields = Object.keys(req.body);
+  // Feature improvement: Dynamically fetching fields from the Mongoose model
+  const allowedUpdateFields = ['description', 'completed'];
+  const isValidUpdate = updateFields.every((update) =>
+    allowedUpdateFields.includes(update)
+  );
+
+  if (!isValidUpdate) return res.status(400).send('Invalid update field.');
+
+  if (!mongoose.isValidObjectId(req.params.id))
+    return res.status(404).send('Invalid id.');
+
+  try {
+    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!task) return res.status(404).send('No task found.');
+    res.send(task);
+  } catch (e) {
+    res.status(400).send(e);
   }
 });
 
