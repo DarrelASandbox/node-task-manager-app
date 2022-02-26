@@ -44,8 +44,8 @@ usersRouter.patch('/users/:id', async (req, res) => {
   const updateFields = Object.keys(req.body);
   // Feature improvement: Dynamically fetching fields from the Mongoose model
   const allowedUpdateFields = ['name', 'age', 'email', 'password'];
-  const isValidUpdateField = updateFields.every((update) =>
-    allowedUpdateFields.includes(update)
+  const isValidUpdateField = updateFields.every((updateField) =>
+    allowedUpdateFields.includes(updateField)
   );
 
   if (!isValidUpdateField) return res.status(400).send('Invalid update field.');
@@ -54,11 +54,22 @@ usersRouter.patch('/users/:id', async (req, res) => {
     return res.status(404).send('Invalid id.');
 
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const user = await User.findById(req.params.id);
     if (!user) return res.status(404).send('No user found.');
+    updateFields.forEach(
+      (updateField) => (user[updateField] = req.body[updateField])
+    );
+    await user.save();
+
+    // Replace the code below with the code above to enable middleware.
+    // findByIdAndUpdate() bypasses mongoose which perform a direct operation on the database.
+
+    // const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    //   new: true,
+    //   runValidators: true,
+    // });
+    // https://mongoosejs.com/docs/validation.html#update-validators
+
     res.send(user);
   } catch (e) {
     res.status(400).send(e);

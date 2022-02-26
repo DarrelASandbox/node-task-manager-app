@@ -1,7 +1,8 @@
+import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import validator from 'validator';
 
-const User = mongoose.model('User', {
+const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   age: {
     type: Number,
@@ -30,16 +31,14 @@ const User = mongoose.model('User', {
   },
 });
 
-// const user = new User({
-//   name: 'mongfoo2',
-//   age: 1,
-//   email: 'mongfoo2@mongmail.com',
-//   password: 'p       d',
-// });
+// encryption -> able to reverse back to original password.
+// hashing -> unable to reverse back to original password. One-way algorithm.
+userSchema.pre('save', async function (next) {
+  if (this.isModified('password'))
+    this.password = await bcrypt.hash(this.password, 10);
 
-// user
-//   .save()
-//   .then(() => console.log(user))
-//   .catch((error) => console.log(error));
+  next();
+});
+const User = mongoose.model('User', userSchema);
 
 export default User;
