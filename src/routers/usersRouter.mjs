@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import User from '../models/users.mjs';
+import auth from '../middleware/auth.mjs';
 
 const usersRouter = new express.Router();
 
@@ -17,16 +18,6 @@ usersRouter.post('/users', async (req, res) => {
   }
 });
 
-usersRouter.get('/users', async (req, res) => {
-  try {
-    const users = await User.find();
-    if (users.length === 0) return res.status(404).send('No user found.');
-    res.send(users);
-  } catch (e) {
-    res.status(500).send();
-  }
-});
-
 usersRouter.post('/users/login', async (req, res) => {
   try {
     const user = await User.findByCredentials(
@@ -38,6 +29,18 @@ usersRouter.post('/users/login', async (req, res) => {
   } catch (e) {
     res.status(400).send();
   }
+});
+
+usersRouter.get('/users/me', auth, async (req, res) => {
+  res.send(req.user);
+
+  // try {
+  //   const users = await User.find();
+  //   if (users.length === 0) return res.status(404).send('No user found.');
+  //   res.send(users);
+  // } catch (e) {
+  //   res.status(500).send();
+  // }
 });
 
 // The findById method will throw an error if the id you pass it is improperly formatted so you should see a 500 error most of the time.
