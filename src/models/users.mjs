@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import validator from 'validator';
+import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
@@ -30,9 +31,26 @@ const userSchema = new mongoose.Schema({
         throw new Error('Password must not contain the word "password".');
     },
   },
+  // array of objects
+  tokens: [
+    {
+      token: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
 });
 
-// create custom method to check credentials.
+// statics are the methods defined on the Model. methods are defined on the document (instance).
+userSchema.methods.generateAuthToken = async function () {
+  const token = jwt.sign({ _id: this.id.toString() }, 'Hunter2');
+  this.tokens = [...this.tokens, { token }];
+  await this.save();
+  return token;
+};
+
+// Add static function model to check credentials.
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
   if (!user) throw new Error('Unable to login.');
