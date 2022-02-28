@@ -42,6 +42,17 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
+// toJSON() behavior: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
+// The toObject method is a method provided by Mongoose to clean up the object so it removes all of the metadata and methods
+// (like .save() or .toObject()) that Mongoose attaches to it. It just becomes a regular object afterward.
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete
+userSchema.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.password;
+  delete userObject.tokens;
+  return userObject;
+};
+
 // statics are the methods defined on the Model. methods are defined on the document (instance).
 userSchema.methods.generateAuthToken = async function () {
   const token = jwt.sign({ _id: this.id.toString() }, 'Hunter2');
