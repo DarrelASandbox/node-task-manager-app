@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import Task from '../models/tasks.mjs';
 import auth from '../middleware/auth.mjs';
+import Task from '../models/tasks.mjs';
 
 const tasksRouter = new express.Router();
 
@@ -21,19 +21,36 @@ tasksRouter.post('/tasks', auth, async (req, res) => {
 // The find method grabs all the specified documents in a collection, but it won't populate its reference fields if there are any in the schema.
 // You need use the populate method if you want to populate those fields.
 tasksRouter.get('/tasks', auth, async (req, res) => {
-  const filter = { owner: req.user._id };
+  const match = {};
+  const sort = {};
 
   // Need to convert "req.query.completed" into a boolean value.
-  // if (req.query.completed === 'true') filter.completed = true;
-  // if (req.query.completed !== 'true') filter.completed = false;
+  // if (req.query.completed === 'true') match.completed = true;
+  // if (req.query.completed !== 'true') match.completed = false;
   if (req.query.completed) {
-    filter.completed = req.query.completed === 'true';
+    match.completed = req.query.completed === 'true';
+  }
+
+  if (req.query.sortBy) {
+    const parts = req.query.sortBy.split('_');
+    sort[parts[0]] = parts[1] === 'desc' ? -1 : 1;
   }
 
   try {
-    const tasks = await Task.find(filter);
-    if (tasks.length === 0) return res.status(404).send('No task found.');
-    res.send(tasks);
+    await req.user.populate({
+      path: 'tasks',
+      match,
+      options: {
+        limit: 5,
+        skip: parseInt(req.query.skip),
+        sort,
+      },
+    });
+
+    if (req.user.tasks.length === 0)
+      return res.status(404).send('No task found.');
+
+    res.send(req.user.tasks);
   } catch (e) {
     res.status(500).send();
   }
