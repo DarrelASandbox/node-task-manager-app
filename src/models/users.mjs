@@ -4,44 +4,49 @@ import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import Task from './tasks.mjs';
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
-  age: {
-    type: Number,
-    validate(value) {
-      if (value < 0) throw new Error('Age must be a positive number.');
-    },
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: true,
-    trim: true,
-    lowercase: true,
-    validator(value) {
-      if (!validator.isEmail(value)) throw new Error('Invalid email');
-    },
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    minLength: 7,
-    validate(value) {
-      if (value.toLowerCase().includes('password'))
-        throw new Error('Password must not contain the word "password".');
-    },
-  },
-  // array of objects
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true,
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    age: {
+      type: Number,
+      validate(value) {
+        if (value < 0) throw new Error('Age must be a positive number.');
       },
     },
-  ],
-});
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
+      lowercase: true,
+      validator(value) {
+        if (!validator.isEmail(value)) throw new Error('Invalid email');
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 7,
+      validate(value) {
+        if (value.toLowerCase().includes('password'))
+          throw new Error('Password must not contain the word "password".');
+      },
+    },
+    // array of objects
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
 
 // It’s a virtual property because users in the database won’t have a tasks field.
 // It’s a reference to the task data stored in the separate collection.
