@@ -18,11 +18,22 @@ tasksRouter.post('/tasks', auth, async (req, res) => {
   }
 });
 
+// The find method grabs all the specified documents in a collection, but it won't populate its reference fields if there are any in the schema.
+// You need use the populate method if you want to populate those fields.
 tasksRouter.get('/tasks', auth, async (req, res) => {
+  const filter = { owner: req.user._id };
+
+  // Need to convert "req.query.completed" into a boolean value.
+  // if (req.query.completed === 'true') filter.completed = true;
+  // if (req.query.completed !== 'true') filter.completed = false;
+  if (req.query.completed) {
+    filter.completed = req.query.completed === 'true';
+  }
+
   try {
-    const task = await Task.find({ owner: req.user._id });
-    if (task.length === 0) return res.status(404).send('No task found.');
-    res.send(task);
+    const tasks = await Task.find(filter);
+    if (tasks.length === 0) return res.status(404).send('No task found.');
+    res.send(tasks);
   } catch (e) {
     res.status(500).send();
   }
