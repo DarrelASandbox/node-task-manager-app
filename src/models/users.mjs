@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
+import Task from './tasks.mjs';
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
@@ -86,6 +87,14 @@ userSchema.pre('save', async function (next) {
 
   next();
 });
+
+// Mongoose has more than one middleware that uses deleteOne().
+// To ensure that this is referencing a user document in the pre hook middleware we need to set the options object with a document: true property.
+userSchema.pre('deleteOne', { document: true }, async function (next) {
+  await Task.deleteMany({ owner: this._id });
+  next();
+});
+
 const User = mongoose.model('User', userSchema);
 
 export default User;
