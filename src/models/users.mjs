@@ -42,6 +42,14 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
+// It’s a virtual property because users in the database won’t have a tasks field.
+// It’s a reference to the task data stored in the separate collection.
+userSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'owner',
+});
+
 // toJSON() behavior: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
 // The toObject method is a method provided by Mongoose to clean up the object so it removes all of the metadata and methods
 // (like .save() or .toObject()) that Mongoose attaches to it. It just becomes a regular object afterward.
