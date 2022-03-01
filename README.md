@@ -25,6 +25,16 @@
    JWT_SECRET=some secret WORD
    MONGODB_URL=mongodb://localhost:27017/myapp
    ```
+4. For Heroku users (https://devcenter.heroku.com/articles/config-vars)
+
+   ```sh
+   heroku create some-unique-app-name-ddmmmyy
+   heroku config:set API_KEY_SENDGRID=value JWT_SECRET=value MONGODB_URL=value
+   heroku config
+   # Replace the respective values above.
+   # e.g heroku config:set API_KEY_SENDGRID=afkw6426as2d JWT_SECRET=Hunter2 MONGODB_URL='someURLinQuotes'
+   # heroku config should shows 3 keys.
+   ```
 
 ### Notes on Advanced Postman
 
