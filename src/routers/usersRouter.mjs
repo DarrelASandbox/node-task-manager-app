@@ -91,14 +91,17 @@ usersRouter.patch('/users/me', auth, async (req, res) => {
   }
 });
 
-usersRouter.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
-  try {
-    if (!req.file) return res.send('Please attach file.');
+usersRouter.post(
+  '/users/me/avatar',
+  upload.single('avatar'),
+  (req, res) => {
+    if (!req.file) return res.send('Please attach a picture.');
     res.send('Successfully uploaded.');
-  } catch (e) {
-    res.status(500).send();
+  },
+  (e, req, res, next) => {
+    res.status(400).send({ error: e.message });
   }
-});
+);
 
 usersRouter.delete('/users/me', auth, async (req, res) => {
   try {
