@@ -1,8 +1,10 @@
 import express from 'express';
 import auth from '../middleware/auth.mjs';
 import User from '../models/users.mjs';
+import multer from 'multer';
 
 const usersRouter = new express.Router();
+const upload = multer({ dest: 'avatar' });
 
 // https://httpstatuses.com/
 usersRouter.post('/users', async (req, res) => {
@@ -71,6 +73,14 @@ usersRouter.patch('/users/me', auth, async (req, res) => {
     res.send(req.user);
   } catch (e) {
     res.status(400).send();
+  }
+});
+
+usersRouter.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+  try {
+    res.send();
+  } catch (e) {
+    res.status(500).send();
   }
 });
 
