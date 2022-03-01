@@ -119,4 +119,16 @@ usersRouter.delete('/users/me', auth, async (req, res) => {
   }
 });
 
+usersRouter.delete('/users/me/avatar', auth, async (req, res) => {
+  try {
+    if (req.user.avatar !== undefined) {
+      req.user.avatar = undefined;
+      await req.user.save();
+      res.send('Avatar has been deleted successfully.');
+    } else res.status(400).send('You have no avatar.');
+  } catch (e) {
+    res.status(500).send();
+  }
+});
+
 export default usersRouter;
