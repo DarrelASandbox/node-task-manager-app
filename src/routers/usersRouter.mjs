@@ -1,5 +1,6 @@
 import express from 'express';
 import multer from 'multer';
+import sharp from 'sharp';
 import auth from '../middleware/auth.mjs';
 import User from '../models/users.mjs';
 
@@ -100,8 +101,14 @@ usersRouter.post(
   upload.single('avatar'),
   async (req, res) => {
     if (!req.file) return res.send('Please attach a picture.');
+    const buffer = await sharp(req.file.buffer)
+      .resize({ width: 250, height: 250 })
+      .png()
+      .toBuffer();
+
     // <img src='data:image/jpg;base64, <binary> >
-    req.user.avatar = req.file.buffer;
+    req.user.avatar = buffer;
+
     await req.user.save();
     res.send('Successfully uploaded.');
   },
@@ -138,7 +145,7 @@ usersRouter.get('/users/:id/avatar', async (req, res) => {
       throw new Error();
     }
     // default header by set Express is res.set('Content-Type', 'application/json');
-    res.set('Content-Type', 'image/jpg');
+    res.set('Content-Type', 'image/png');
     res.send(user.avatar);
   } catch (e) {
     res.status(404).send();

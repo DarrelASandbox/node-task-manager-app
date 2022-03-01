@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 import jwt from 'jsonwebtoken';
 import Task from './tasks.mjs';
+import sharp from 'sharp';
 
 const userSchema = new mongoose.Schema(
   {
@@ -69,6 +70,7 @@ userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.tokens;
+  delete userObject.avatar;
   return userObject;
 };
 
