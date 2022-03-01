@@ -76,7 +76,7 @@ userSchema.methods.toJSON = function () {
 
 // statics are the methods defined on the Model. methods are defined on the document (instance).
 userSchema.methods.generateAuthToken = async function () {
-  const token = jwt.sign({ _id: this.id.toString() }, 'Hunter2');
+  const token = jwt.sign({ _id: this.id.toString() }, process.env.JWT_SECRET);
   this.tokens = [...this.tokens, { token }];
   await this.save();
   return token;
