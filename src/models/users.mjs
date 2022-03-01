@@ -42,6 +42,11 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+    // https://mongoosejs.com/docs/schematypes.html#buffers
+    // https://nodejs.org/api/buffer.html#buffer
+    avatar: {
+      type: Buffer,
+    },
   },
   {
     timestamps: true,

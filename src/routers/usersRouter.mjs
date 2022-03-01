@@ -9,7 +9,6 @@ import User from '../models/users.mjs';
 // Instead, you'd need to add a try/catch statement to catch the error and respond to the error.
 const usersRouter = new express.Router();
 const upload = multer({
-  dest: 'avatar',
   limits: { fileSize: 1_000_000 },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpg|jpeg|png)$/))
@@ -91,11 +90,19 @@ usersRouter.patch('/users/me', auth, async (req, res) => {
   }
 });
 
+// Do not store the image in the file system because the file system gets wipe when deploying to hosting service.
+// In this tutorial, we will store the image binary data by adding additional field in user model.
+// However, ideally storing the image path would be preferred. Using services like Amazon S3 or Google Storage bucket.
+// When your user uploads the image, you send the image itself to the bucket, retrieve the URL, and save the image URL in your blog document instead.
 usersRouter.post(
   '/users/me/avatar',
+  auth,
   upload.single('avatar'),
-  (req, res) => {
+  async (req, res) => {
     if (!req.file) return res.send('Please attach a picture.');
+    // <img src='data:image/jpg;base64, <binary> >
+    req.user.avatar = req.file.buffer;
+    await req.user.save();
     res.send('Successfully uploaded.');
   },
   (e, req, res, next) => {
