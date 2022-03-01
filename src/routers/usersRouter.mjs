@@ -131,4 +131,18 @@ usersRouter.delete('/users/me/avatar', auth, async (req, res) => {
   }
 });
 
+usersRouter.get('/users/:id/avatar', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user || !user.avatar) {
+      throw new Error();
+    }
+    // default header by set Express is res.set('Content-Type', 'application/json');
+    res.set('Content-Type', 'image/jpg');
+    res.send(user.avatar);
+  } catch (e) {
+    res.status(404).send();
+  }
+});
+
 export default usersRouter;
