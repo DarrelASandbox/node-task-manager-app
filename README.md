@@ -11,6 +11,21 @@
    npm install
    ```
 
+2. From task-manager folder
+
+   ```sh
+   mkdir config
+   touch ./config/dev.env
+   ```
+
+3. Enter the information in dev.env
+   ```env
+   PORT=3000
+   API_KEY_SENDGRID=API Key from https://sendgrid.com/
+   JWT_SECRET=some secret WORD
+   MONGODB_URL=mongodb://localhost:27017/myapp
+   ```
+
 ### Notes on Advanced Postman
 
 - https://learning.postman.com/docs/sending-requests/managing-environments/
