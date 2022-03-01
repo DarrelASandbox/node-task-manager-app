@@ -3,6 +3,7 @@ import multer from 'multer';
 import sharp from 'sharp';
 import auth from '../middleware/auth.mjs';
 import User from '../models/users.mjs';
+import { deleteAccountEmail, sendWelcomeEmail } from '../emails/account.mjs';
 
 // With callbacks, you typically want to pass the error as an argument instead of throwing an error.
 // That lets you respond to the error by adding code inside the callback.
@@ -27,6 +28,7 @@ usersRouter.post('/users', async (req, res) => {
 
   try {
     await user.save();
+    sendWelcomeEmail(user.email, user.name);
     const token = await user.generateAuthToken();
     res.status(201).send({ user, token });
   } catch (e) {
@@ -120,6 +122,7 @@ usersRouter.post(
 usersRouter.delete('/users/me', auth, async (req, res) => {
   try {
     await req.user.deleteOne();
+    deleteAccountEmail(req.user.email, req.user.name);
     res.send(req.user);
   } catch (e) {
     res.status(500).send();
