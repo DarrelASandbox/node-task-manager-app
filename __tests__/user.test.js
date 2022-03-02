@@ -3,13 +3,16 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import app from '../src/app';
 import User from '../src/models/users.mjs';
+import util from 'util';
+
+const sleep = util.promisify(setTimeout);
 
 const user1Id = new mongoose.Types.ObjectId();
 const user1 = {
   _id: user1Id,
   name: 'mongchick',
   age: 7,
-  email: 'mongchick@mongmail.com',
+  email: 'darrelaiscoding@gmail.com',
   password: 'passw0rd',
   tokens: [
     {
@@ -26,15 +29,26 @@ beforeEach(async () => {
 
 test('Should signup a new user.', async () => {
   try {
-    await request(app)
+    const response = await request(app)
       .post('/users')
       .send({
-        name: 'mongDA',
+        name: 'mongkong',
         age: 8,
-        email: 'darrelaiscoding@gmail.com',
+        email: 'mongkong@mongmail.com',
         password: 'passw0rd',
       })
       .expect(201);
+
+    // Assert that the database was changed correctly.
+    const user = await User.findById(response.body.user._id);
+    expect(user).not.toBeNull();
+
+    // Assertions about the response
+    expect(response.body).toMatchObject({
+      user: { name: 'mongkong', age: 8, email: 'mongkong@mongmail.com' },
+      token: user.tokens[0].token,
+    });
+    expect(user.password).not.toBe('passw0rd');
   } catch (e) {
     expect(e).toMatch('error');
   }
@@ -47,7 +61,7 @@ test('Should not contain "password" in password field', async () => {
       .send({
         name: user1.name,
         age: user1.age,
-        email: user1.email,
+        email: 'mongpassword@mongmail.com',
         password: 'password',
       })
       .expect(400);
@@ -72,12 +86,17 @@ test('Should have unique email.', async () => {
   }
 });
 
-test('Should login a user.', async () => {
+test('Should login an exisiting user.', async () => {
   try {
-    await request(app)
+    const response = await request(app)
       .post('/users/login')
       .send({ email: user1.email, password: user1.password })
       .expect(200);
+
+    // Assert that token in response matches users second token.
+    const user = await User.findById(user1Id);
+    await sleep(800);
+    expect(response.body.token).toBe(user.tokens[1].token);
   } catch (e) {
     expect(e).toMatch('error');
   }
@@ -122,6 +141,10 @@ test('Should delete account for user.', async () => {
       .set('Authorization', `Bearer ${user1.tokens[0].token}`)
       .send()
       .expect(200);
+
+    // Assert null response
+    const user = await User.findById(user1Id);
+    expect(user).toBeNull();
   } catch (e) {
     expect(e).toMatch('error');
   }

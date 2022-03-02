@@ -61,6 +61,37 @@
 - `sendWelcomeEmail(...)` under ./src/routers/usersRouter.mjs
 - `deleteAccountEmail(...)`
 
+### Notes taken from Advanced Assertions comment section:
+
+In case anyone is still getting this error, read this response from Adam :
+
+> "Yeah, that's normal. If you create the same token too fast (within a second of each other) then it outputs the same token. For example, if you do:
+
+```js
+console.log(jwt.sign({ _id: '123abc' }, 'abc123'));
+console.log(jwt.sign({ _id: '123abc' }, 'abc123'));
+```
+
+> Then the same token is output and that's what is happening in your tests. The tests run so fast that the same token is being added to the array."
+
+With Adam's advice, I promisified setTimeout with the help of the 'util' module of nodejs -
+
+```js
+const sleep = require('util').promisify(setTimeout);
+```
+
+Then, I used sleep right before I awaited the response.
+
+```js
+await sleep(800);
+const response = await request(app)
+  .post('/users/login')
+  .send({ email: userOne.email, password: userOne.password })
+  .expect(200);
+```
+
+Now, it's working perfectly 100% of the times, whereas earlier it was working only 50% of the times.
+
 ### Notes taken from Advanced Postman comment section:
 
 > The majority of the apps you'll write as a programmer won't have a frontend or GUI. That Darksky API and Mapbox API we used earlier don't have frontends, they're just APIs as with our Task Manager API. The frontend is the easy part, you just send fetch requests to your backend as we did in the Weather app. Postman is used to simulate a client querying your API. You do send headers in the client, e.g:
