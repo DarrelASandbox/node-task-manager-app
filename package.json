@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node ./src/index.mjs",
     "dev": "env-cmd -f ./config/dev.env npx nodemon -e mjs,js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
   },
   "keywords": [],
   "author": "",
