@@ -44,7 +44,7 @@
 - Setup env in Postman so that copy and pasting token, etc... is not required.
 - Wrote test scripts for POST Login User and POST Create User.
 
-### Notes on testEnvironment
+### Notes on testing using Jest:
 
 - https://jestjs.io/docs/configuration#testenvironment-string
 - Default is `node` & Browser-like environment is `jsdom`.
@@ -55,6 +55,11 @@
     "testEnvironment": "jsdom"
   }
 ```
+
+- Commented out the following to prevent email spam from testing.
+- `sgMail.setApiKey(process.env.API_KEY_SENDGRID);` under ./src/emails/account.mjd
+- `sendWelcomeEmail(...)` under ./src/routers/usersRouter.mjs
+- `deleteAccountEmail(...)`
 
 ### Notes taken from Advanced Postman comment section:
 

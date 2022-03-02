@@ -39,7 +39,7 @@ test('Should not contain "password" in password field', async () => {
       .send({
         name: user1.name,
         age: user1.age,
-        email: 'someuniqueemail@mongmail.com',
+        email: user1.email,
         password: 'password',
       })
       .expect(400);
@@ -54,7 +54,7 @@ test('Should have unique email.', async () => {
       .post('/users')
       .send({
         name: 'randomName',
-        age: 999,
+        age: 999_999_999_999,
         email: user1.email,
         password: 'randomPassw0rd',
       })
