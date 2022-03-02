@@ -32,6 +32,38 @@ test('Should signup a new user.', async () => {
   }
 });
 
+test('Should not contain "password" in password field', async () => {
+  try {
+    await request(app)
+      .post('/users')
+      .send({
+        name: user1.name,
+        age: user1.age,
+        email: 'someuniqueemail@mongmail.com',
+        password: 'password',
+      })
+      .expect(400);
+  } catch (e) {
+    expect(e).toMatch('error');
+  }
+});
+
+test('Should have unique email.', async () => {
+  try {
+    await request(app)
+      .post('/users')
+      .send({
+        name: 'randomName',
+        age: 999,
+        email: user1.email,
+        password: 'randomPassw0rd',
+      })
+      .expect(400);
+  } catch (e) {
+    expect(e).toMatch('error');
+  }
+});
+
 test('Should login a user.', async () => {
   try {
     await request(app)
