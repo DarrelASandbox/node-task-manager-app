@@ -36,11 +36,25 @@
    # heroku config should shows 3 keys.
    ```
 
+## Notes
+
 ### Notes on Advanced Postman
 
 - https://learning.postman.com/docs/sending-requests/managing-environments/
 - Setup env in Postman so that copy and pasting token, etc... is not required.
 - Wrote test scripts for POST Login User and POST Create User.
+
+### Notes on testEnvironment
+
+- https://jestjs.io/docs/configuration#testenvironment-string
+- Default is `node` & Browser-like environment is `jsdom`.
+
+```json
+,
+  "jest": {
+    "testEnvironment": "jsdom"
+  }
+```
 
 ### Notes taken from Advanced Postman comment section:
 
