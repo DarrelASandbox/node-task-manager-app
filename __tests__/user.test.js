@@ -1,14 +1,26 @@
+import { jest } from '@jest/globals';
+import sgMail from '@sendgrid/mail';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import util from 'util';
 import app from '../src/app';
 import User from '../src/models/users.mjs';
-import { user1, user1Id, setupDatabase } from './fixtures/db';
+import { setupDatabase, user1, user1Id } from './fixtures/db';
 
+jest.mock('@sendgrid/mail');
+
+const defaultMailOptions = { response: 'Okay' };
 const sleep = util.promisify(setTimeout);
+
+beforeAll(() => sgMail.setApiKey(process.env.API_KEY_SENDGRID));
 
 // https://jestjs.io/docs/setup-teardown
 beforeEach(setupDatabase);
+
+beforeEach(() => {
+  global.mockMailer = (options = defaultMailOptions) =>
+    sgMail.send.mockImplementation(() => Promise.resolve(options));
+});
 
 test('Should signup a new user.', async () => {
   try {
@@ -184,6 +196,8 @@ test('Should not update invalid user field.', async () => {
     expect(e).toBe('error');
   }
 });
+
+afterEach(() => jest.clearAllMocks());
 
 afterAll(async () => await mongoose.disconnect());
 
