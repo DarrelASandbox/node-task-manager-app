@@ -17,7 +17,7 @@ test('Should signup a new user.', async () => {
       .send({
         name: 'mongkong',
         age: 8,
-        email: 'mongkong@mongmail.com',
+        email: 'mongkong@example.com',
         password: 'passw0rd',
       })
       .expect(201);
@@ -28,7 +28,7 @@ test('Should signup a new user.', async () => {
 
     // Assertions about the response
     expect(response.body).toMatchObject({
-      user: { name: 'mongkong', age: 8, email: 'mongkong@mongmail.com' },
+      user: { name: 'mongkong', age: 8, email: 'mongkong@example.com' },
       token: user.tokens[0].token,
     });
     expect(user.password).not.toBe('passw0rd');
@@ -44,7 +44,7 @@ test('Should not contain "password" in password field', async () => {
       .send({
         name: user1.name,
         age: user1.age,
-        email: 'mongpassword@mongmail.com',
+        email: 'mongpassword@example.com',
         password: 'password',
       })
       .expect(400);
@@ -89,7 +89,7 @@ test('Should not login non-existent user.', async () => {
   try {
     await request(app)
       .post('/users/login')
-      .send({ email: 'monggong@mongmail.com', password: user1.password })
+      .send({ email: 'monggong@example.com', password: user1.password })
       .expect(400);
   } catch (e) {
     expect(e).toMatch('error');
@@ -164,10 +164,10 @@ test('Should update valid user field.', async () => {
     await request(app)
       .patch('/users/me')
       .set('Authorization', `Bearer ${user1.tokens[0].token}`)
-      .send({ name: 'mongCat' })
+      .send({ name: 'mongcat' })
       .expect(200);
     const user = await User.findById(user1Id);
-    expect(user.name).toBe('mongCat');
+    expect(user.name).toBe('mongcat');
   } catch (e) {
     expect(e).toBe('error');
   }
