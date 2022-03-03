@@ -3,21 +3,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import util from 'util';
 import app from '../src/app';
-import {
-  deleteAccountEmail,
-  sendWelcomeEmail,
-} from '../src/emails/account.mjs';
 import User from '../src/models/users.mjs';
-
-jest.mock('../src/emails/account.mjs', () => ({
-  __esModule: true,
-  sendWelcomeEmail: jest
-    .fn()
-    .mockImplementation(() => 'You have called a mocked sendWelcomeEmail!'),
-  deleteAccountEmail: jest
-    .fn()
-    .mockImplementation(() => 'You have called a mocked deleteAccountEmail!'),
-}));
 
 const sleep = util.promisify(setTimeout);
 
@@ -52,10 +38,6 @@ test('Should signup a new user.', async () => {
         password: 'passw0rd',
       })
       .expect(201);
-
-    expect(sendWelcomeEmail()).toBe(
-      'You have called a mocked sendWelcomeEmail!'
-    );
 
     // Assert that the database was changed correctly.
     const user = await User.findById(response.body.user._id);
@@ -160,10 +142,6 @@ test('Should delete account for user.', async () => {
       .send()
       .expect(200);
 
-    expect(deleteAccountEmail()).toBe(
-      'You have called a mocked deleAccountEmail!'
-    );
-
     // Assert null response
     const user = await User.findById(user1Id);
     expect(user).toBeNull();
@@ -177,6 +155,50 @@ test('Should not delete account for unauthenticated user.', async () => {
     await request(app).delete('/users/me').send().expect(401);
   } catch (e) {
     expect(e).toMatch('error');
+  }
+});
+
+// Fixtues are things that allow you to setup up an environment your tests are going to run in.
+// attach() is provided by supertest.
+// .toBe means === and {} !== {} so the test case will fail since it is 2 distinct objects.
+// So use .toEqual
+test('Should upload avatar image.', async () => {
+  try {
+    await request(app)
+      .post('/users/me/avatar')
+      .set('Authorization', `Bearer ${user1.tokens[0].token}`)
+      .attach('avatar', '__tests__/fixtures/profile-pic.jpg')
+      .expect(200);
+    const user = await User.findById(user1Id);
+    expect(user.avatar).toEqual(expect.any(Buffer));
+  } catch (e) {
+    expect(e).toMatch('error');
+  }
+});
+
+test('Should update valid user field.', async () => {
+  try {
+    await request(app)
+      .patch('/users/me')
+      .set('Authorization', `Bearer ${user1.tokens[0].token}`)
+      .send({ name: 'mongCat' })
+      .expect(200);
+    const user = await User.findById(user1Id);
+    expect(user.name).toBe('mongCat');
+  } catch (e) {
+    expect(e).toBe('error');
+  }
+});
+
+test('Should not update invalid user field.', async () => {
+  try {
+    await request(app)
+      .patch('/users/me')
+      .set('Authorization', `Bearer ${user1.tokens[0].token}`)
+      .send({ someinvalidfield: 'mongcat' })
+      .expect(400);
+  } catch (e) {
+    expect(e).toBe('error');
   }
 });
 

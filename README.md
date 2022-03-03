@@ -46,6 +46,8 @@
 
 ### Notes on testing using Jest:
 
+- https://links.mead.io/files (Images for testing)
+
 - https://jestjs.io/docs/configuration#testenvironment-string
 - Default is `node` & Browser-like environment is `jsdom`.
 
