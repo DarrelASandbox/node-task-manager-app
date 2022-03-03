@@ -1,31 +1,14 @@
-import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import util from 'util';
 import app from '../src/app';
 import User from '../src/models/users.mjs';
+import { user1, user1Id, setupDatabase } from './fixtures/db';
 
 const sleep = util.promisify(setTimeout);
 
-const user1Id = new mongoose.Types.ObjectId();
-const user1 = {
-  _id: user1Id,
-  name: 'mongchick',
-  age: 7,
-  email: 'darrelaiscoding@gmail.com',
-  password: 'passw0rd',
-  tokens: [
-    {
-      token: jwt.sign({ _id: user1Id }, process.env.JWT_SECRET),
-    },
-  ],
-};
-
 // https://jestjs.io/docs/setup-teardown
-beforeEach(async () => {
-  await User.deleteMany();
-  await new User(user1).save();
-});
+beforeEach(setupDatabase);
 
 test('Should signup a new user.', async () => {
   try {
