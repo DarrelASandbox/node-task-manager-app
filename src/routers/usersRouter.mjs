@@ -28,7 +28,7 @@ usersRouter.post('/users', async (req, res) => {
 
   try {
     await user.save();
-    // sendWelcomeEmail(user.email, user.name);
+    sendWelcomeEmail(user.email, user.name);
     const token = await user.generateAuthToken();
     res.status(201).send({ user, token });
   } catch (e) {
@@ -45,7 +45,7 @@ usersRouter.post('/users/login', async (req, res) => {
     const token = await user.generateAuthToken();
     res.send({ user, token });
   } catch (e) {
-    res.status(400).send();
+    res.status(400).send(e);
   }
 });
 
@@ -122,7 +122,7 @@ usersRouter.post(
 usersRouter.delete('/users/me', auth, async (req, res) => {
   try {
     await req.user.deleteOne();
-    // deleteAccountEmail(req.user.email, req.user.name);
+    deleteAccountEmail(req.user.email, req.user.name);
     res.send(req.user);
   } catch (e) {
     res.status(500).send();
