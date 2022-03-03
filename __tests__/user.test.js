@@ -1,9 +1,23 @@
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import request from 'supertest';
-import app from '../src/app';
-import User from '../src/models/users.mjs';
 import util from 'util';
+import app from '../src/app';
+import {
+  deleteAccountEmail,
+  sendWelcomeEmail,
+} from '../src/emails/account.mjs';
+import User from '../src/models/users.mjs';
+
+jest.mock('../src/emails/account.mjs', () => ({
+  __esModule: true,
+  sendWelcomeEmail: jest
+    .fn()
+    .mockImplementation(() => 'You have called a mocked sendWelcomeEmail!'),
+  deleteAccountEmail: jest
+    .fn()
+    .mockImplementation(() => 'You have called a mocked deleteAccountEmail!'),
+}));
 
 const sleep = util.promisify(setTimeout);
 
@@ -38,6 +52,10 @@ test('Should signup a new user.', async () => {
         password: 'passw0rd',
       })
       .expect(201);
+
+    expect(sendWelcomeEmail()).toBe(
+      'You have called a mocked sendWelcomeEmail!'
+    );
 
     // Assert that the database was changed correctly.
     const user = await User.findById(response.body.user._id);
@@ -141,6 +159,10 @@ test('Should delete account for user.', async () => {
       .set('Authorization', `Bearer ${user1.tokens[0].token}`)
       .send()
       .expect(200);
+
+    expect(deleteAccountEmail()).toBe(
+      'You have called a mocked deleAccountEmail!'
+    );
 
     // Assert null response
     const user = await User.findById(user1Id);
